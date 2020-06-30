@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use nusoap_server;
+use soapclient;
 use Illuminate\Http\Request;
 class SoapController extends Controller
 {
@@ -23,6 +24,13 @@ class SoapController extends Controller
                     array("Username"=>'xsd:string',"Password"=>'xsd:string',"Ping"=>'xsd:string'), //Input
                     array("return"=>"xsd:string") //Output
                 );
+    $server->register(
+        "hello", 
+        array("name"=>'xsd:string'),
+        array("return"=>"xsd:string") //Output
+
+        );
+
         $HTTP_RAW_POST_DATA = isset($HTTP_RAW_POST_DATA) ? $HTTP_RAW_POST_DATA : '';
         $server->service($HTTP_RAW_POST_DATA);   
     }
@@ -68,7 +76,7 @@ class SoapController extends Controller
     }
     
     function BillPayment($Username, $Password = null, $Consumer_Number = null, $Tran_Auth_Id = null, $Transaction_Amount = null, $Tran_Date = null, $Tran_Time = null, $Bank_Mnemonic = null, $Reserved = null) {
-        $curl = curl_init();
+            $curl = curl_init();
         curl_setopt_array($curl, array(
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_URL => PROJECT_URL.'/BillPayment',
@@ -103,6 +111,7 @@ class SoapController extends Controller
     }
     
     function EchoTransaction($Username, $Password = null, $Ping = null) {
+    define('PROJECT_URL', 'http://localhost/soap/public/');
         $curl = curl_init();
         curl_setopt_array($curl, array(
             CURLOPT_RETURNTRANSFER => 1,
@@ -128,4 +137,27 @@ class SoapController extends Controller
         }
         return $string;
     }
+
+
+
+function hello($name)
+{
+if(!$name){
+return new soap_fault('Client','','Put your name!');
+}
+
+$result = "Hello, ".$name;
+return $result;
+}
+
+
+public function test(){
+
+$client = new soapclient('http://localhost/soap/public/index.php?wsdl');
+// Call the SOAP method
+$result = $client->call('hello', array('name' => 'StackOverFlow'));
+// Display the result
+print_r($result);
+
+}
 }

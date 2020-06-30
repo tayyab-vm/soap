@@ -12,3 +12,5 @@
 */
 
 Route::get('/', 'SoapController@index');
+Route::get('EchoTransaction', 'SoapController@EchoTransaction');
+Route::get('test', 'SoapController@test');
