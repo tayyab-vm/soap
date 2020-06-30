@@ -2,37 +2,37 @@
 
 namespace App\Http\Controllers;
 use nusoap_server;
-use soapclient;
-use Illuminate\Http\Request;
+//use soapclient;
+
+
 class SoapController extends Controller
 {
     public function index(){
+
         $server         = new nusoap_server();
-        $server->configureWSDL("Finpay","urn:Finpay");
+        $server->configureWSDL("Finpay",false, url('service'));
+
         $server->register(
                     "BillInquiry",
                     array("Username"=>'xsd:string',"Password"=>'xsd:string',"Consumer_Number"=>'xsd:intger',"Bank_Mnemonic"=>'xsd:string',"Reserved"=>'xsd:string'), //Input
                     array("return"=>"xsd:string") //Output
                 );
+
         $server->register(
                     "BillPayment",
                     array("Username"=>'xsd:string',"Password"=>'xsd:string',"Consumer_Number"=>'xsd:intger',"Transaction_Auth_ID"=>'xsd:intger',"Transaction_Amount"=>'xsd:intger',"Tran_Date"=>'xsd:intger',"Tran_Time"=>'xsd:intger',"Bank_Mnemonic"=>'xsd:string',"Reserved"=>'xsd:string'), //Input
                     array("return"=>"xsd:string") //Output
                 );
+
         $server->register(
                     "EchoTransaction",
                     array("Username"=>'xsd:string',"Password"=>'xsd:string',"Ping"=>'xsd:string'), //Input
                     array("return"=>"xsd:string") //Output
                 );
-    $server->register(
-        "hello", 
-        array("name"=>'xsd:string'),
-        array("return"=>"xsd:string") //Output
 
-        );
+        $rawPostData = file_get_contents("php://input");
+        return response($server->service($rawPostData), 200, array('Content-Type' => 'text/xml; charset=ISO-8859-1'));
 
-        $HTTP_RAW_POST_DATA = isset($HTTP_RAW_POST_DATA) ? $HTTP_RAW_POST_DATA : '';
-        $server->service($HTTP_RAW_POST_DATA);   
     }
 
 
@@ -110,54 +110,27 @@ class SoapController extends Controller
         return $string;
     }
     
-    function EchoTransaction($Username, $Password = null, $Ping = null) {
-    define('PROJECT_URL', 'http://localhost/soap/public/');
-        $curl = curl_init();
-        curl_setopt_array($curl, array(
-            CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_URL => PROJECT_URL.'/EchoTransaction',
-            CURLOPT_POST => 1,
-            CURLOPT_POSTFIELDS => json_encode(array(
-                "Username" => $Username,
-                "Password" => $Password,
-                "Ping" => $Ping
-                    )
-        )));
-        $response = curl_exec($curl);
-        if (!curl_exec($curl)) {
-            die('Error: "' . curl_error($curl) . '" - Code: ' . curl_errno($curl));
-        }
-        curl_close($curl);
-        $array1 = json_decode($response, TRUE);
-        $string = '';
-        if ($array1['Response_Code'] == '00') {
-            $string = 'ARE_YOU_ALIVE';
-        } else {
-            $string = $array1['Response_Code'];
-        }
-        return $string;
+    public function EchoTransaction($Username, $Password = null, $Ping = null) {
+
+//        if ($array1['Response_Code'] == '00') {
+//            $string = 'ARE_YOU_ALIVE';
+//        } else {
+//            $string = $array1['Response_Code'];
+//        }
+        return 'ARE_YOU_ALIVE';
     }
 
+    public function test()
+    {
+//        $client = new \SoapClient ('http://127.0.0.1:8000/index.php/service?wsdl');
 
+//        $result = $client->call('EchoTransaction', array('Username' => 'a', 'Password' => 'b', 'Ping' => 'c'));
 
-function hello($name)
-{
-if(!$name){
-return new soap_fault('Client','','Put your name!');
-}
+//        $client->EchoTransaction(array('Username' => 'a', 'Password' => 'b', 'Ping' => 'c'));
+//        dd($client->__getLastRequest());
 
-$result = "Hello, ".$name;
-return $result;
-}
-
-
-public function test(){
-
-$client = new soapclient('http://localhost/soap/public/index.php?wsdl');
-// Call the SOAP method
-$result = $client->call('hello', array('name' => 'StackOverFlow'));
-// Display the result
-print_r($result);
-
-}
+        $client = new \nusoap_client('http://localhost/soap/api/api?wsdl', true);
+        $result = $client->call("test", "HelloWorld");
+        echo $result; exit();
+    }
 }
