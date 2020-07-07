@@ -17,7 +17,7 @@ use Illuminate\Http\Request;
 //    return $request->user();
 //});
 
-Route::any('api', function() {
+/*Route::any('api', function() {
 
 //    require_once ('nusoap.php');
     $server = new \nusoap_server();
@@ -36,4 +36,4 @@ Route::any('api', function() {
     $rawPostData = file_get_contents("php://input");
     return \Response::make($server->service($rawPostData), 200, array('Content-Type' => 'text/xml; charset=ISO-8859-1'));
 
-});
+});*/

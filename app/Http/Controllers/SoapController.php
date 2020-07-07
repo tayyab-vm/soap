@@ -1,38 +1,51 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Http\Request;
 use nusoap_server;
 //use soapclient;
 
 
 class SoapController extends Controller
 {
-    public function index(){
+    public function index(Request $request){
 
         $server         = new nusoap_server();
         $server->configureWSDL("Finpay",false, url('service'));
 
-        $server->register(
-                    "BillInquiry",
-                    array("Username"=>'xsd:string',"Password"=>'xsd:string',"Consumer_Number"=>'xsd:intger',"Bank_Mnemonic"=>'xsd:string',"Reserved"=>'xsd:string'), //Input
-                    array("return"=>"xsd:string") //Output
-                );
-
-        $server->register(
-                    "BillPayment",
-                    array("Username"=>'xsd:string',"Password"=>'xsd:string',"Consumer_Number"=>'xsd:intger',"Transaction_Auth_ID"=>'xsd:intger',"Transaction_Amount"=>'xsd:intger',"Tran_Date"=>'xsd:intger',"Tran_Time"=>'xsd:intger',"Bank_Mnemonic"=>'xsd:string',"Reserved"=>'xsd:string'), //Input
-                    array("return"=>"xsd:string") //Output
-                );
-
-        $server->register(
-                    "EchoTransaction",
-                    array("Username"=>'xsd:string',"Password"=>'xsd:string',"Ping"=>'xsd:string'), //Input
-                    array("return"=>"xsd:string") //Output
-                );
+//        $server->register(
+//                    "BillInquiry",
+//                    array("Username"=>'xsd:string',"Password"=>'xsd:string',"Consumer_Number"=>'xsd:intger',"Bank_Mnemonic"=>'xsd:string',"Reserved"=>'xsd:string'), //Input
+//                    array("return"=>"xsd:string") //Output
+//                );
+//
+//        $server->register(
+//                    "BillPayment",
+//                    array("Username"=>'xsd:string',"Password"=>'xsd:string',"Consumer_Number"=>'xsd:intger',"Transaction_Auth_ID"=>'xsd:intger',"Transaction_Amount"=>'xsd:intger',"Tran_Date"=>'xsd:intger',"Tran_Time"=>'xsd:intger',"Bank_Mnemonic"=>'xsd:string',"Reserved"=>'xsd:string'), //Input
+//                    array("return"=>"xsd:string") //Output
+//                );
+//
+//        $server->register(
+//                    "EchoTransaction",
+//                    array("Username"=>'xsd:string',"Password"=>'xsd:string',"Ping"=>'xsd:string'), //Input
+//                    array("return"=>"xsd:string") //Output
+//                );
+        $server->register('test',
+            array('input' => 'xsd:string'),
+            array('output' => 'xsd:string')
+        );
 
         $rawPostData = file_get_contents("php://input");
         return response($server->service($rawPostData), 200, array('Content-Type' => 'text/xml; charset=ISO-8859-1'));
 
+    }
+
+    public function testA()
+    {
+
+        $client = new \nusoap_client('http://localhost/soap/service?wsdl', true);
+        $result = $client->call("test", ["input" => "HelloWorld"]);
+        dd($result);
     }
 
 
@@ -120,17 +133,4 @@ class SoapController extends Controller
         return 'ARE_YOU_ALIVE';
     }
 
-    public function test()
-    {
-//        $client = new \SoapClient ('http://127.0.0.1:8000/index.php/service?wsdl');
-
-//        $result = $client->call('EchoTransaction', array('Username' => 'a', 'Password' => 'b', 'Ping' => 'c'));
-
-//        $client->EchoTransaction(array('Username' => 'a', 'Password' => 'b', 'Ping' => 'c'));
-//        dd($client->__getLastRequest());
-
-        $client = new \nusoap_client('http://localhost/soap/api/api?wsdl', true);
-        $result = $client->call("test", "HelloWorld");
-        echo $result; exit();
-    }
 }

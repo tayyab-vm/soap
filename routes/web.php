@@ -11,7 +11,7 @@
 |
 */
 
-Route::get('/service', 'SoapController@index');
-Route::post('/index.php/EchoTransaction', 'SoapController@EchoTransaction');
-Route::get('/index.php/EchoTransaction', 'SoapController@EchoTransaction');
-Route::post('/test', 'SoapController@test');
+//Route::post('/index.php/EchoTransaction', 'SoapController@EchoTransaction');
+//Route::post('/index.php/EchoTransaction', 'SoapController@EchoTransaction');
+Route::get('/test', 'SoapController@testA');
+Route::any('/service', 'SoapController@index');
